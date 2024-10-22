@@ -1,9 +1,14 @@
 package com.inforcap.exampleintentsbundles
 
+import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -56,7 +61,30 @@ class MainActivity : AppCompatActivity() {
         }
 
 
+        val intentSendText = Intent()
+        intentSendText.action = Intent.ACTION_SEND
+        intentSendText.putExtra(Intent.EXTRA_TEXT,"Hola Android")
+        intentSendText.type = "text/plain"
+        val shareIntent = Intent.createChooser(intentSendText,"Compartiendo...")
+
+        binding.buttonIntentSendText.setOnClickListener {
+            startActivity(shareIntent)
+        }
+
+        binding.buttonIntentCamera.setOnClickListener {
+            startForResult.launch(Intent(MediaStore.ACTION_IMAGE_CAPTURE))
+        }
 
 
     }
+
+    private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val intent = result.data
+            val imageBitmap = intent?.extras?.get("data") as Bitmap
+            val imageView = binding.imageViewCaptura
+            imageView.setImageBitmap(imageBitmap)
+        }
+    }
+
 }
